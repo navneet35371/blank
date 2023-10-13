@@ -1,0 +1,36 @@
+# This runs all blankly Module Tests
+
+name: Blankly Module Tests
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.10
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install pytest
+        pip install pytest-mock
+        pip install kucoin-python
+
+    - name: Inject Keys
+      run: |
+        echo "$KEYS_FILE" > ./tests/config/keys.json
+      shell: bash
+      env: 
+        KEYS_FILE: ${{ secrets.SANDBOX_KEYS }}
+    - name: Run test file
+      run: |
+        pytest
+        echo "Sleeping to reduce rate limit pressure..."
