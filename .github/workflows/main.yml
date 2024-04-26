@@ -1,0 +1,2 @@
+- name: Ollama GitHub Code Reviewer
+  uses: brobles82/ollama-github-reviews@v0.0.3
