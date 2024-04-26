@@ -31,10 +31,10 @@ jobs:
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           file_content="$(cat $file)"
           prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format $file_content"
-          payload="\"{\"model\": \"mistral\", \"prompt\": \"$prompt\", \"stream\": false}\""
+          payload="EOF\"{\"model\": \"mistral\", \"prompt\": \"$prompt\", \"stream\": false}\"EOF"
           echo "$payload" >> ollama_payload.txt
           echo "$payload"
-          review=$(curl -s http://127.0.0.1:11434/api/generate -d "$(cat ollama_payload.txt)" | jq -r '.response')
+          review=$(curl -s http://127.0.0.1:11434/api/generate --data-binary @- << ```echo "$payload"``` | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
           echo "$comment" >> ollama_review.txt
           echo "$file_content"
