@@ -32,7 +32,7 @@ jobs:
           file_content="$(cat $file)"
           prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format $file_content"
           echo "$prompt" >> ollama_prompt.txt
-          payload=$(jq -Rs '{ model: "mistral", stream: false, prompt: . }' ollama_prompt.txt")
+          payload=$(jq -Rs '{ model: "mistral", stream: false, prompt: . }' ollama_prompt.txt)
           echo "$payload" >> ollama_payload.txt
           review=$(curl -H "Content-Type: text/xml" -v -s http://127.0.0.1:11434/api/generate --data-binary "@ollama_payload.txt" | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
