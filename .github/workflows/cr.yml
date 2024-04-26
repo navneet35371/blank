@@ -1,0 +1,60 @@
+name: Ollama Code Review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+jobs:
+  ollama_review:
+    name: Ollama Code Review
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+        conda-env: false
+
+    - name: Install Ollama CLI and dependencies
+      uses: actions/setup-python@v1
+      shell: bash
+      script: |
+        install ollama --quiet
+        pip install jq
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v43
+
+    - name: Review code
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          file_content="$(cat $file)"
+          prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format.\n\`\`\`\${file_content}\`\`\" > ollama_prompt.txt
+          payload=$(jq -Rs '{ model: "mistral", stream: false, prompt: . }' ollama_prompt.txt)
+          review="$(ollama review --token ${{ secrets.OLLAMA_TOKEN }} "${payload}" | jq -r '.response')"
+          comment="Ollama Code Review for \`$file\`:\n\n${review}"
+          echo "$comment" >> ollama_review.txt
+        done
+        
+      shell: bash
+      continue-on-error: false
+      
+    - name: Comment on PR
+      if: success()
+      uses: actions/github-script@v6
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        script: |
+          const { context } = require('@actions/github');
+          context.github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: Buffer.from(JSON.stringify(await Deno.readTextFile('ollama_review.txt'))).toString(),
+          });
