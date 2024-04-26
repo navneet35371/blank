@@ -16,7 +16,7 @@ jobs:
     - name: Cache Ollama model
       uses: actions/cache@v2
       with:
-        path: $HOME/.ollama/models
+        path: /usr/share/ollama/.ollama/models
         key: ollama-model-${{ runner.os }}-${{ hashFiles('ollama.lock') }}
         restore-keys: ollama-model-${{ runner.os }}-
       
@@ -25,7 +25,6 @@ jobs:
         curl -fsSL https://ollama.com/install.sh | sh
         ollama serve &
         ollama pull llama3
-        ollama show --modelfile llama3
       shell: bash
 
     - name: Get changed files
