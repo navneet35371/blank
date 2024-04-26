@@ -33,7 +33,7 @@ jobs:
           prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format $file_content"
           payload="{\"model\": \"mistral\", \"prompt\": \"Review the following file: $prompt\", \"stream\": false}"
           echo "$payload"
-          review=$(curl -s http://127.0.0.1:11434/api/generate -d $payload | jq -r '.response')
+          review=$(curl -s http://127.0.0.1:11434/api/generate -d "$payload" | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
           echo "$comment" >> ollama_review.txt
           echo "$file_content"
