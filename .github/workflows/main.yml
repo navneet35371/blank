@@ -17,7 +17,7 @@ jobs:
       run: |
         curl -fsSL https://ollama.com/install.sh | sh
         ollama serve &
-        ollama pull mistral
+        ollama pull llama3
       shell: bash
 
     - name: Get changed files
@@ -32,7 +32,7 @@ jobs:
           file_content="$(cat $file)"
           prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format $file_content"
           echo "$prompt" >> ollama_prompt.txt
-          payload=$(jq -Rs '{ model: "mistral", stream: false, prompt: . }' ollama_prompt.txt)
+          payload=$(jq -Rs '{ model: "llama3", stream: false, prompt: . }' ollama_prompt.txt)
           echo "$payload" >> ollama_payload.txt
           review=$(curl -H "Content-Type: text/xml" -v -s http://127.0.0.1:11434/api/generate --data-binary "@ollama_payload.txt" | jq -r '.response')
           comment="Ollama Code Review for \`$file\`: $review"
@@ -43,6 +43,3 @@ jobs:
         gh pr comment ${{ github.event.pull_request.number }} --body "$(cat ollama_review.txt)"
       shell: bash
       
-    # - name: Run Ollama Review
-    #   run: |
-    #     ollama review --token ${{ secrets.OLLAMA_TOKEN }}
