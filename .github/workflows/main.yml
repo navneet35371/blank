@@ -6,7 +6,7 @@ on:
 
 jobs:
   ollama_review:
-    name: Ollama Code Review
+    name: Ollama Code Reviews
     runs-on: ubuntu-latest
     
     steps:
