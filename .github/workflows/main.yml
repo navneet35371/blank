@@ -1,2 +1,8 @@
-- name: Ollama GitHub Code Reviewer
-  uses: brobles82/ollama-github-reviews@v0.0.3
+name: example-basic
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+jobs :
+  codereview:
+    name: Ollama GitHub Code Reviewer
+    uses: brobles82/ollama-github-reviews@v0.0.3
