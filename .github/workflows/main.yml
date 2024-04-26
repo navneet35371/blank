@@ -32,12 +32,12 @@ jobs:
           file_content="$(cat $file)"
           prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format $file_content"
           payload="\"{\"model\": \"mistral\", \"prompt\": \"$prompt\", \"stream\": false}\""
+          echo "$payload" >> ollama_payload.txt
           echo "$payload"
-          review=$(curl -s http://127.0.0.1:11434/api/generate -d ```echo "$payload"``` | jq -r '.response')
+          review=$(curl -s http://127.0.0.1:11434/api/generate -d "$(cat ollama_payload.txt)" | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
           echo "$comment" >> ollama_review.txt
           echo "$file_content"
-          echo "$payload"
         done
 
         gh pr comment ${{ github.event.pull_request.number }} --body "$(cat ollama_review.txt)"
