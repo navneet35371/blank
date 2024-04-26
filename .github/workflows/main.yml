@@ -16,7 +16,7 @@ jobs:
     - name: Install Ollama CLI
       run: |
         curl -fsSL https://ollama.com/install.sh | sh
-        ollama serve
+        ollama serve &
         ollama pull mistral
       shell: bash
 
