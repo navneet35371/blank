@@ -19,6 +19,11 @@ jobs:
         ollama serve &
         ollama pull mistral
       shell: bash
+    - name: Cache Ollama packages
+      uses: actions/cache@v3
+      with:
+        path: |
+          /var/lib/ollama/.ollama/models
 
     - name: Get changed files
       id: changed-files
@@ -31,7 +36,7 @@ jobs:
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           file_content="$(cat $file)"
           prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format $file_content"
-          review=$(curl -s http://127.0.0.1:11434/api/generate -d '{"model": "mistral", "prompt": "Review the following file:\n\n```\n$(cat $file)\n```", "stream": false}' | jq -r '.response')
+          review=$(curl -s http://127.0.0.1:11434/api/generate -d '{"model": "mistral", "prompt": "Review the following file:\n\n```$(cat $file)```", "stream": false}' | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
           echo "$comment" >> ollama_review.txt
           echo "$file_content"
