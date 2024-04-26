@@ -12,6 +12,13 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+
+    - name: Cache Ollama model
+      uses: actions/cache@v2
+      with:
+        path: $HOME/.ollama/models
+        key: ollama-model-${{ runner.os }}-${{ hashFiles('ollama.lock') }}
+        restore-keys: ollama-model-${{ runner.os }}-
       
     - name: Install Ollama CLI
       run: |
