@@ -34,7 +34,7 @@ jobs:
           payload="{\"model\": \"mistral\", \"prompt\": \"$prompt\", \"stream\": false}"
           echo "$payload" >> ollama_payload.txt
           echo "$payload"
-          review=$(curl -v -s http://127.0.0.1:11434/api/generate --data-binary ollama_payload.txt | jq -r '.response')
+          review=$(curl -H "Content-Type: text/xml" -v -s http://127.0.0.1:11434/api/generate --data-binary "@ollama_payload.txt" | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
           echo "$comment" >> ollama_review.txt
           echo "$file_content"
