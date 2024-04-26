@@ -30,7 +30,7 @@ jobs:
       run: |
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           file_content="$(cat $file)"
-          prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format\n\n $file_content"
+          prompt="Review this changeset. Provide suggestions for improvements, coding best practices, improve readability, and maintainability. Respond in markdown format```\n\n $file_content```"
           review=$(curl -s http://127.0.0.1:11434/api/generate -d '{"model": "mistral", "prompt": "```\n $prompt ```", "stream": false}' | jq -r '.response')
           comment="Ollama Code Review for \`$file\`:\n\n$review"
           echo "$comment" >> ollama_review.txt
